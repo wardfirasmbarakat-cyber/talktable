@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 
 export default function CustomerPage() {
@@ -28,17 +26,17 @@ export default function CustomerPage() {
           TalkTable
         </h1>
         <p style={{ fontSize: '1rem', color: 'rgba(240,240,248,0.5)', maxWidth: '320px', lineHeight: '1.6' }}>
-          AI-powered ordering — scan your table's QR code to get started
+          AI-powered ordering — scan your table&apos;s QR code to get started
         </p>
       </div>
 
       {/* Feature cards */}
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '3rem', maxWidth: '600px' }}>
-        {[
+        {([
           { icon: '💬', title: 'Talk to AI', desc: 'Ask questions, get recommendations' },
           { icon: '🛒', title: 'Order Easily', desc: 'Add items and place your order' },
           { icon: '📡', title: 'Live Updates', desc: 'Track your order in real time' },
-        ].map(f => (
+        ] as const).map(f => (
           <div key={f.title} style={{
             background: '#08080F', border: '1px solid rgba(255,255,255,0.07)',
             borderRadius: '16px', padding: '1.25rem', textAlign: 'center', width: '160px',
@@ -62,9 +60,12 @@ export default function CustomerPage() {
 
       {/* Staff login link */}
       <Link href="/login" style={{
-        fontSize: '0.72rem', color: 'rgba(240,240,248,0.25)',
-        textDecoration: 'none', borderBottom: '1px solid rgba(240,240,248,0.1)',
-        paddingBottom: '1px', transition: 'color 0.2s',
+        fontSize: '0.75rem',
+        color: 'rgba(240,240,248,0.35)',
+        textDecoration: 'none',
+        padding: '8px 16px',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '8px',
       }}>
         Staff login →
       </Link>
