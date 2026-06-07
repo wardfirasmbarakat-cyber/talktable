@@ -19,6 +19,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
 }
 
 const PUBLIC_ROUTES = [
+  '/',
   '/login',
   '/register',
   '/change-password',
@@ -30,7 +31,7 @@ const PUBLIC_ROUTES = [
 ]
 
 function isPublic(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(r => pathname.startsWith(r))
+  return PUBLIC_ROUTES.some(r => r === '/' ? pathname === '/' : pathname.startsWith(r))
 }
 
 function getRequiredRoles(pathname: string): string[] | null {
