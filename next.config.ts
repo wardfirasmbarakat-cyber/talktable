@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     },
   ],
   poweredByHeader: false,
-  serverExternalPackages: ['argon2', 'socket.io'],
+  serverExternalPackages: ['@node-rs/argon2', 'socket.io'],
 }
 
 export default nextConfig

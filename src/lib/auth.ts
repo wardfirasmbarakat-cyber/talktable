@@ -2,7 +2,7 @@
 // Production-grade auth: Argon2 hashing, JWT via jose, session management
 
 import { SignJWT, jwtVerify } from 'jose'
-import * as argon2 from 'argon2'
+import * as argon2 from '@node-rs/argon2'
 import { cookies } from 'next/headers'
 import { prisma } from './db'
 import type { Role } from '@prisma/client'
@@ -51,7 +51,6 @@ export function isDemoPassword(password: string): boolean {
 
 export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password, {
-    type: argon2.argon2id,
     memoryCost: 65536,   // 64 MB
     timeCost: 3,
     parallelism: 4,

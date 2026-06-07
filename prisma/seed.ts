@@ -2,12 +2,11 @@
 // Run: npm run db:seed
 
 import { PrismaClient } from '@prisma/client'
-import argon2 from 'argon2'
+import argon2 from '@node-rs/argon2'
 
 const prisma = new PrismaClient()
 
 const DEMO_PASSWORD_HASH = await argon2.hash('123321admin', {
-  type: argon2.argon2id,
   memoryCost: 65536,
   timeCost: 3,
   parallelism: 4,
