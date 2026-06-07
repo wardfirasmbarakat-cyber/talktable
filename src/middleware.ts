@@ -19,8 +19,9 @@ const ROLE_ROUTES: Record<string, string[]> = {
 }
 
 const PUBLIC_ROUTES = [
-  '/auth/login',
-  '/auth/register',
+  '/login',
+  '/register',
+  '/change-password',
   '/api/auth/login',
   '/api/auth/logout',
   '/api/auth/me',
@@ -64,7 +65,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     const url = req.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/login'
     url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
@@ -80,7 +81,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json({ error: 'Token expired', code: 'TOKEN_EXPIRED' }, { status: 401 })
     }
     const url = req.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/login'
     url.searchParams.set('redirect', pathname)
     return NextResponse.redirect(url)
   }
@@ -100,7 +101,7 @@ export async function middleware(req: NextRequest) {
       WAITER:  '/dashboard/waiter',
     }
     const url = req.nextUrl.clone()
-    url.pathname = dashboardByRole[payload.role] ?? '/auth/login'
+    url.pathname = dashboardByRole[payload.role] ?? '/login'
     return NextResponse.redirect(url)
   }
 

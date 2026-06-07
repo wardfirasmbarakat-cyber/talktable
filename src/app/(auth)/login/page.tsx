@@ -43,7 +43,7 @@ function LoginForm() {
 
       // Force password change for demo accounts or flagged users
       if (user.mustChangePassword) {
-        router.push('/auth/change-password?required=true')
+        router.push('/change-password?required=true')
         return
       }
 
