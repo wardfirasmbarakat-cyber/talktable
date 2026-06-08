@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 export default function CustomerPage() {
   return (
     <div style={{
@@ -58,17 +56,18 @@ export default function CustomerPage() {
         </p>
       </div>
 
-      {/* Staff login link */}
-      <Link href="/login" style={{
+      {/* Staff login link — plain <a> so it works without JS */}
+      <a href="/login" style={{
         fontSize: '0.75rem',
         color: 'rgba(240,240,248,0.35)',
         textDecoration: 'none',
         padding: '8px 16px',
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: '8px',
+        display: 'inline-block',
       }}>
         Staff login →
-      </Link>
+      </a>
     </div>
   )
 }
