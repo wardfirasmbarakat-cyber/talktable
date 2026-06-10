@@ -63,7 +63,7 @@ jobs:
         run: |
           npm ci
           npx prisma generate
-          # Baseline the existing schema so migrate deploy doesn't complain about non-empty DB
-          npx prisma migrate resolve --applied 20260610140958_init 2>&1 || true
-          npx prisma migrate deploy
+          # Push schema to database (creates all tables)
+          npx prisma db push --accept-data-loss
+          # Seed demo data
           npx tsx prisma/seed.ts
