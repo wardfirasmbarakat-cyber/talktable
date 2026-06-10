@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "npx tsx server.ts",
-    "build": "prisma generate && (if [ -n \"$DATABASE_URL\" ]; then prisma migrate deploy; fi) && next build",
+    "build": "prisma generate && next build",
     "start": "NODE_ENV=production npx tsx server.ts",
     "lint": "next lint",
     "db:migrate": "prisma migrate dev",
