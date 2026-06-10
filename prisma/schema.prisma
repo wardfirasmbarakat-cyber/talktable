@@ -282,9 +282,17 @@ model OrderStatusHistory {
 }
 
 // ── WAITER REQUESTS ───────────────────────────────
+enum WaiterRequestType {
+  CALL_WAITER
+  REQUEST_BILL
+  WATER_REFILL
+  ASSISTANCE
+}
+
 model WaiterRequest {
-  id           String        @id @default(cuid())
+  id           String             @id @default(cuid())
   restaurantId String
+  type         WaiterRequestType  @default(CALL_WAITER)
   tableId      String
   table        Table         @relation(fields: [tableId], references: [id])
   orderId      String?       @unique
@@ -296,6 +304,51 @@ model WaiterRequest {
   resolvedAt   DateTime?
 
   @@index([restaurantId, status])
+}
+
+// ── FEEDBACK ──────────────────────────────────────
+model Feedback {
+  id               String   @id @default(cuid())
+  restaurantId     String
+  tableId          String?
+  orderId          String?
+  foodRating       Int
+  serviceRating    Int
+  atmosphereRating Int
+  comment          String?  @db.Text
+  createdAt        DateTime @default(now())
+
+  @@index([restaurantId, createdAt])
+}
+
+// ── INVENTORY ─────────────────────────────────────
+model InventoryItem {
+  id                String   @id @default(cuid())
+  restaurantId      String
+  name              String
+  unit              String
+  quantity          Decimal  @db.Decimal(10, 3)
+  lowStockThreshold Decimal  @db.Decimal(10, 3)
+  cost              Decimal? @db.Decimal(10, 3)
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([restaurantId])
+}
+
+// ── KNOWLEDGE BASE ────────────────────────────────
+model KnowledgeItem {
+  id           String   @id @default(cuid())
+  restaurantId String
+  category     String
+  title        String
+  content      String   @db.Text
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([restaurantId, category])
 }
 
 // ── AUDIT LOG ─────────────────────────────────────
