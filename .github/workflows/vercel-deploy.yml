@@ -1,0 +1,75 @@
+name: Deploy to Vercel
+
+on:
+  workflow_dispatch:
+    inputs:
+      vercel_token:
+        description: 'Vercel Token'
+        required: true
+        type: string
+      database_url:
+        description: 'Database URL'
+        required: true
+        type: string
+      jwt_secret:
+        description: 'JWT Secret'
+        required: true
+        type: string
+      app_url:
+        description: 'App URL'
+        required: true
+        type: string
+      vercel_project_id:
+        description: 'Vercel Project ID (from .vercel/project.json or dashboard)'
+        required: false
+        type: string
+        default: 'talktable-inky'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/eloquent-hamilton-0RMnt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Link Vercel project and set env vars
+        env:
+          VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        run: |
+          # Pull project info (links the project)
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" 2>&1 || true
+
+          # Remove existing env vars (ignore errors if they don't exist)
+          vercel env rm DATABASE_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm JWT_SECRET production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm NEXT_PUBLIC_APP_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm NODE_ENV production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+
+          # Add env vars
+          echo '${{ inputs.database_url }}' | vercel env add DATABASE_URL production --token="$VERCEL_TOKEN"
+          echo '${{ inputs.jwt_secret }}' | vercel env add JWT_SECRET production --token="$VERCEL_TOKEN"
+          echo '${{ inputs.app_url }}' | vercel env add NEXT_PUBLIC_APP_URL production --token="$VERCEL_TOKEN"
+          echo 'production' | vercel env add NODE_ENV production --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        run: |
+          vercel deploy --prod --token="$VERCEL_TOKEN" 2>&1
+
+      - name: Seed database
+        env:
+          DATABASE_URL: ${{ inputs.database_url }}
+        run: |
+          npm ci
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
