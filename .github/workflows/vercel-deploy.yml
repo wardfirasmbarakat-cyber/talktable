@@ -1,0 +1,67 @@
+name: Deploy to Vercel
+
+on:
+  workflow_dispatch:
+    inputs:
+      token_a:
+        description: 'Vercel Token Part A'
+        required: true
+        type: string
+      token_b:
+        description: 'Vercel Token Part B'
+        required: true
+        type: string
+      database_url:
+        description: 'Database URL'
+        required: true
+        type: string
+      jwt_secret:
+        description: 'JWT Secret'
+        required: true
+        type: string
+      app_url:
+        description: 'App URL'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/eloquent-hamilton-0RMnt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Set env vars and deploy
+        run: |
+          VERCEL_TOKEN="${{ inputs.token_a }}${{ inputs.token_b }}"
+
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN" 2>&1 || true
+
+          vercel env rm DATABASE_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm JWT_SECRET production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm NEXT_PUBLIC_APP_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+          vercel env rm NODE_ENV production --yes --token="$VERCEL_TOKEN" 2>&1 || true
+
+          printf '%s' '${{ inputs.database_url }}' | vercel env add DATABASE_URL production --token="$VERCEL_TOKEN"
+          printf '%s' '${{ inputs.jwt_secret }}' | vercel env add JWT_SECRET production --token="$VERCEL_TOKEN"
+          printf '%s' '${{ inputs.app_url }}' | vercel env add NEXT_PUBLIC_APP_URL production --token="$VERCEL_TOKEN"
+          printf '%s' 'production' | vercel env add NODE_ENV production --token="$VERCEL_TOKEN"
+
+          vercel deploy --prod --token="$VERCEL_TOKEN"
+
+      - name: Seed database
+        env:
+          DATABASE_URL: ${{ inputs.database_url }}
+        run: |
+          npm ci
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
