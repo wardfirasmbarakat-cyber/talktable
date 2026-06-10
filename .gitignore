@@ -33,3 +33,5 @@ next-env.d.ts
 
 # extracted zip
 /extracted_codebase/
+server.js
+src/**/*.js

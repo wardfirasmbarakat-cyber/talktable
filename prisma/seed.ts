@@ -6,13 +6,13 @@ import argon2 from '@node-rs/argon2'
 
 const prisma = new PrismaClient()
 
-const DEMO_PASSWORD_HASH = await argon2.hash('123321admin', {
-  memoryCost: 65536,
-  timeCost: 3,
-  parallelism: 4,
-})
-
 async function main() {
+  const DEMO_PASSWORD_HASH = await argon2.hash('123321admin', {
+    memoryCost: 65536,
+    timeCost: 3,
+    parallelism: 4,
+  })
+
   console.log('🌱 Seeding TalkTable database...')
 
   // ── Restaurant ─────────────────────────────────────────────────────────────
