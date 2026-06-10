@@ -3,8 +3,12 @@ name: Deploy to Vercel
 on:
   workflow_dispatch:
     inputs:
-      vercel_token:
-        description: 'Vercel Token'
+      token_a:
+        description: 'Vercel Token Part A'
+        required: true
+        type: string
+      token_b:
+        description: 'Vercel Token Part B'
         required: true
         type: string
       database_url:
@@ -19,11 +23,6 @@ on:
         description: 'App URL'
         required: true
         type: string
-      vercel_project_id:
-        description: 'Vercel Project ID (from .vercel/project.json or dashboard)'
-        required: false
-        type: string
-        default: 'talktable-inky'
 
 jobs:
   deploy:
@@ -40,30 +39,27 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Link Vercel project and set env vars
-        env:
-          VERCEL_TOKEN: ${{ inputs.vercel_token }}
+      - name: Set env vars and deploy
         run: |
-          # Pull project info (links the project)
+          VERCEL_TOKEN="${{ inputs.token_a }}${{ inputs.token_b }}"
+
+          # Pull/link project
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN" 2>&1 || true
 
-          # Remove existing env vars (ignore errors if they don't exist)
+          # Remove old env vars
           vercel env rm DATABASE_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
           vercel env rm JWT_SECRET production --yes --token="$VERCEL_TOKEN" 2>&1 || true
           vercel env rm NEXT_PUBLIC_APP_URL production --yes --token="$VERCEL_TOKEN" 2>&1 || true
           vercel env rm NODE_ENV production --yes --token="$VERCEL_TOKEN" 2>&1 || true
 
-          # Add env vars
-          echo '${{ inputs.database_url }}' | vercel env add DATABASE_URL production --token="$VERCEL_TOKEN"
-          echo '${{ inputs.jwt_secret }}' | vercel env add JWT_SECRET production --token="$VERCEL_TOKEN"
-          echo '${{ inputs.app_url }}' | vercel env add NEXT_PUBLIC_APP_URL production --token="$VERCEL_TOKEN"
-          echo 'production' | vercel env add NODE_ENV production --token="$VERCEL_TOKEN"
+          # Set env vars
+          printf '%s' '${{ inputs.database_url }}' | vercel env add DATABASE_URL production --token="$VERCEL_TOKEN"
+          printf '%s' '${{ inputs.jwt_secret }}' | vercel env add JWT_SECRET production --token="$VERCEL_TOKEN"
+          printf '%s' '${{ inputs.app_url }}' | vercel env add NEXT_PUBLIC_APP_URL production --token="$VERCEL_TOKEN"
+          printf '%s' 'production' | vercel env add NODE_ENV production --token="$VERCEL_TOKEN"
 
-      - name: Deploy to Vercel
-        env:
-          VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        run: |
-          vercel deploy --prod --token="$VERCEL_TOKEN" 2>&1
+          # Deploy
+          vercel deploy --prod --token="$VERCEL_TOKEN"
 
       - name: Seed database
         env:
