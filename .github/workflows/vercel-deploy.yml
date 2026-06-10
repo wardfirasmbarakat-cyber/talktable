@@ -57,11 +57,13 @@ jobs:
 
           vercel deploy --prod --token="$VERCEL_TOKEN"
 
-      - name: Seed database
+      - name: Setup database and seed
         env:
           DATABASE_URL: ${{ inputs.database_url }}
         run: |
           npm ci
           npx prisma generate
+          # Baseline the existing schema so migrate deploy doesn't complain about non-empty DB
+          npx prisma migrate resolve --applied 20260610140958_init 2>&1 || true
           npx prisma migrate deploy
           npx tsx prisma/seed.ts
