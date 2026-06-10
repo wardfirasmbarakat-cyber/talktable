@@ -3,7 +3,8 @@
 
 import { SignJWT, jwtVerify } from 'jose'
 import * as argon2 from '@node-rs/argon2'
-import { cookies } from 'next/headers'
+// 'cookies' imported dynamically inside getAuthFromCookies to avoid
+// AsyncLocalStorage invariant when module is loaded in non-request contexts (custom server.ts)
 import { prisma } from './db'
 import type { Role } from '@prisma/client'
 
@@ -161,6 +162,7 @@ const COOKIE_OPTIONS = {
 }
 
 export async function setAuthCookies(sessionToken: string, accessToken: string) {
+  const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
   cookieStore.set('tt_session', sessionToken, {
     ...COOKIE_OPTIONS,
@@ -168,31 +170,31 @@ export async function setAuthCookies(sessionToken: string, accessToken: string) 
   })
   cookieStore.set('tt_access', accessToken, {
     ...COOKIE_OPTIONS,
-    maxAge: 15 * 60, // 15 minutes
+    maxAge: 15 * 60,
   })
 }
 
 export async function clearAuthCookies() {
+  const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
   cookieStore.delete('tt_session')
   cookieStore.delete('tt_access')
 }
 
 export async function getAuthFromCookies(): Promise<TokenPayload | null> {
+  const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('tt_access')?.value
   if (accessToken) {
     const payload = await verifyAccessToken(accessToken)
     if (payload) return payload
   }
-  // Access token expired — try refresh via session token
   const sessionToken = cookieStore.get('tt_session')?.value
   if (!sessionToken) return null
   const { valid, userId } = await validateSession(sessionToken)
   if (!valid || !userId) return null
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user || !user.isActive) return null
-  // Issue a new access token (silent refresh)
   const session = await prisma.session.findFirst({
     where: { token: sessionToken, revokedAt: null },
   })
