@@ -8,14 +8,14 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET ?? 'dev-secre
 
 // ── ROUTE PERMISSIONS ─────────────────────────────────────────────────────────
 const ROLE_ROUTES: Record<string, string[]> = {
-  '/dashboard/admin':   ['ADMIN'],
-  '/dashboard/manager': ['ADMIN', 'OWNER', 'MANAGER'],
-  '/dashboard/kitchen': ['ADMIN', 'OWNER', 'MANAGER', 'KITCHEN'],
-  '/dashboard/waiter':  ['ADMIN', 'OWNER', 'MANAGER', 'WAITER'],
-  '/api/admin':         ['ADMIN'],
-  '/api/users':         ['ADMIN', 'OWNER', 'MANAGER'],
-  '/api/menu':          ['ADMIN', 'OWNER', 'MANAGER'],
-  '/api/tables':        ['ADMIN', 'OWNER', 'MANAGER'],
+  '/admin':   ['ADMIN'],
+  '/manager': ['ADMIN', 'OWNER', 'MANAGER'],
+  '/kitchen': ['ADMIN', 'OWNER', 'MANAGER', 'KITCHEN'],
+  '/waiter':  ['ADMIN', 'OWNER', 'MANAGER', 'WAITER'],
+  '/api/admin':  ['ADMIN'],
+  '/api/users':  ['ADMIN', 'OWNER', 'MANAGER'],
+  '/api/menu':   ['ADMIN', 'OWNER', 'MANAGER'],
+  '/api/tables': ['ADMIN', 'OWNER', 'MANAGER'],
 }
 
 const PUBLIC_ROUTES = [
@@ -95,11 +95,11 @@ export async function middleware(req: NextRequest) {
     }
     // Redirect to their own dashboard
     const dashboardByRole: Record<string, string> = {
-      ADMIN:   '/dashboard/admin',
-      OWNER:   '/dashboard/manager',
-      MANAGER: '/dashboard/manager',
-      KITCHEN: '/dashboard/kitchen',
-      WAITER:  '/dashboard/waiter',
+      ADMIN:   '/admin',
+      OWNER:   '/manager',
+      MANAGER: '/manager',
+      KITCHEN: '/kitchen',
+      WAITER:  '/waiter',
     }
     const url = req.nextUrl.clone()
     url.pathname = dashboardByRole[payload.role] ?? '/login'

@@ -64,7 +64,9 @@ function ChangePasswordForm() {
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Failed to change password'); return }
       setSuccess(true)
-      setTimeout(() => router.push('/dashboard'), 2000)
+      const me = await fetch('/api/auth/me', { credentials: 'include' }).then(r => r.json()).catch(() => null)
+      const dashByRole: Record<string, string> = { ADMIN: '/admin', OWNER: '/manager', MANAGER: '/manager', KITCHEN: '/kitchen', WAITER: '/waiter' }
+      setTimeout(() => router.push(dashByRole[me?.user?.role] ?? '/login'), 1500)
     } catch {
       setError('Network error. Please try again.')
     } finally {
@@ -132,7 +134,7 @@ function ChangePasswordForm() {
 
 export default function ChangePasswordPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div style={{ minHeight:'100vh', background:'#04040A' }} />}>
       <ChangePasswordForm />
     </Suspense>
   )

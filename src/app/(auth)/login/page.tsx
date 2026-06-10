@@ -49,11 +49,11 @@ function LoginForm() {
 
       // Route by role
       const dashByRole: Record<string, string> = {
-        ADMIN:   '/dashboard/admin',
-        OWNER:   '/dashboard/manager',
-        MANAGER: '/dashboard/manager',
-        KITCHEN: '/dashboard/kitchen',
-        WAITER:  '/dashboard/waiter',
+        ADMIN:   '/admin',
+        OWNER:   '/manager',
+        MANAGER: '/manager',
+        KITCHEN: '/kitchen',
+        WAITER:  '/waiter',
       }
       router.push(dashByRole[user.role] ?? redirect)
     } catch {
@@ -155,7 +155,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div style={{ minHeight:'100vh', background:'#04040A' }} />}>
       <LoginForm />
     </Suspense>
   )
