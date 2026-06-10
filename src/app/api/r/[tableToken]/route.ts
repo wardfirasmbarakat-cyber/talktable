@@ -5,9 +5,9 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { tableToken: string } }
+  { params }: { params: Promise<{ tableToken: string }> }
 ) {
-  const { tableToken } = params
+  const { tableToken } = await params
 
   const table = await prisma.table.findUnique({
     where: { qrToken: tableToken },

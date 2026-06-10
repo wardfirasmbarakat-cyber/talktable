@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -145,7 +145,8 @@ function LoadingScreen() {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function TablePage({ params }: { params: { slug: string; tableToken: string } }) {
+export default function TablePage({ params: paramsPromise }: { params: Promise<{ slug: string; tableToken: string }> }) {
+  const params = React.use(paramsPromise)
   const [screen, setScreen] = useState<Screen>('loading')
   const [lang, setLang] = useState<Language>('en')
   const [data, setData] = useState<PageData | null>(null)
